@@ -38,7 +38,7 @@ model = load_model()
 # 4. Interface do Usuário
 st.title("🎓 Oportunidades de Bolsa de Pesquisa")
 
-query = st.text_input("Descreva o que você procura (ex: Doutorado em Biologia na Europa)")
+query = st.text_input("Descreva o que você procura (ex: Doutorado em Administração na Europa)")
 
 if query:
     # Busca Semântica via IA
@@ -63,3 +63,4 @@ else:
             st.write(f"**Prazo:** {item['deadline']}")
             st.write(item['description'])
             st.link_button("Ver Edital", item['link'])
+
