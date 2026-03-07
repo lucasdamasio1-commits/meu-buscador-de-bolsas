@@ -1,7 +1,7 @@
 from playwright.sync_api import sync_playwright
 
 def capturar_fapesp():
-    oportunidades = # LISTA INICIALIZADA CORRETAMENTE
+    oportunidades = # Inicialização corrigida
     try:
         with sync_playwright() as p:
             browser = p.chromium.launch(headless=True)
@@ -9,7 +9,7 @@ def capturar_fapesp():
             print("Acessando portal de oportunidades FAPESP...")
             page.goto("https://fapesp.br/oportunidades/", timeout=60000)
             
-            # Aguarda carregar a lista de editais
+            # Aguarda carregar os itens dinâmicos 
             page.wait_for_selector(".oportunidade-item", timeout=10000)
             itens = page.query_selector_all(".oportunidade-item")
             
