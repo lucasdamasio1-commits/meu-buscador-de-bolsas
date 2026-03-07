@@ -1,44 +1,46 @@
-import requests
 import pandas as pd
 import io
+from utils import get_request
 
-def capturar_nacional():
-    print("Iniciando captura nacional (CNPq)...")
-    
+def captura_nacional():
+
+    print("Capturando bolsas CNPq...")
+
     CSV_LINK = "https://dadosabertos.cnpq.br/bolsas_pais_2024.csv"
 
     try:
-        response = requests.get(CSV_LINK, timeout=30)
-        response.raise_for_status()
+
+        response = get_request(CSV_LINK)
 
         df = pd.read_csv(
             io.BytesIO(response.content),
             sep=";",
             encoding="latin-1",
-            on_bad_lines='skip'
+            on_bad_lines="skip"
         )
 
         df.columns = [c.upper() for c in df.columns]
 
-        if 'STATUS_BOLSA' in df.columns:
-            bolsas_ativas = df[df['STATUS_BOLSA'] == 'ATIVO']
+        if "STATUS_BOLSA" in df.columns:
+            bolsas = df[df["STATUS_BOLSA"] == "ATIVO"]
         else:
-            bolsas_ativas = df.head(20)
+            bolsas = df.head(20)
 
         resultados = []
 
-        for _, row in bolsas_ativas.iterrows():
+        for _, row in bolsas.head(30).iterrows():
+
             resultados.append({
-                "title": f"Bolsa {row.get('MODALIDADE_BOLSA', 'Pesquisa')}",
+                "title": f"Bolsa {row.get('MODALIDADE_BOLSA','Pesquisa')}",
                 "provider": "CNPq",
-                "link": "https://www.gov.br/cnpq/pt-br",
-                "description": f"Instituição: {row.get('NOME_INSTITUICAO', 'N/A')} | Área: {row.get('NOME_GRANDE_AREA', 'N/A')}",
+                "link": "https://www.gov.br/cnpq",
+                "description": f"{row.get('NOME_INSTITUICAO','')} - {row.get('NOME_GRANDE_AREA','')}",
                 "deadline": None
             })
 
-        print(f"✅ Capturadas {len(resultados)} bolsas nacionais.")
+        print("CNPq:", len(resultados))
         return resultados
 
     except Exception as e:
-        print(f"❌ Erro na captura nacional: {e}")
+        print("Erro CNPq:", e)
         return []
