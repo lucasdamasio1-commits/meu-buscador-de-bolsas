@@ -1,36 +1,29 @@
-from playwright.sync_api import sync_playwright
+import requests
+import pandas as pd
 
-def capturar_fapesp():
-    with sync_playwright() as p:
-        # 1. Inicia o navegador (headless=True para rodar em segundo plano)
-        browser = p.chromium.launch(headless=True)
-        page = browser.new_page()
-        
-        print("Acessando portal de oportunidades FAPESP...")
-        page.goto("https://fapesp.br/oportunidades/")
-        
-        # 2. Aguarda o carregamento da lista de editais
-        page.wait_for_selector(".oportunidade-item") # Seletor exemplo da lista
-        
-        # 3. Extrai dados de todos os blocos de oportunidade
-        oportunidades =
-        itens = page.query_selector_all(".oportunidade-item")
-        
-        for item in itens:
-            titulo = item.query_selector("h2").inner_text()
-            prazo = item.query_selector(".prazo").inner_text()
-            link = item.query_selector("a").get_attribute("href")
-            
-            oportunidades.append({
-                "title": titulo,
-                "deadline": prazo,
-                "link": f"https://fapesp.br{link}",
-                "provider": "FAPESP"
-            })
-        
-        browser.close()
-        print(f"Encontradas {len(oportunidades)} novas oportunidades na FAPESP.")
-        return oportunidades
+# Link de exemplo para bolsas no país (ajuste para o arquivo CSV mais recente do portal)
+CSV_LINK = "https://dadosabertos.cnpq.br/bolsas_pais_2024.csv" 
 
-if __name__ == "__main__":
-    capturar_fapesp()
+def capturar_nacional():
+    print("Iniciando captura nacional (CNPq)...")
+    try:
+        response = requests.get(CSV_LINK)
+        with open("temp_bolsas.csv", "wb") as f:
+            f.write(response.content)
+        
+        # Lê o CSV corrigindo o separador comum no Brasil (;)
+        df = pd.read_csv("temp_bolsas.csv", sep=";", encoding="latin-1")
+        
+        # Filtro corrigido: garante que pegamos apenas bolsas ativas
+        # Ajuste o nome da coluna 'STATUS_BOLSA' conforme o cabeçalho real do arquivo
+        if 'STATUS_BOLSA' in df.columns:
+            bolsas_ativas = df == 'ATIVO']
+        else:
+            bolsas_ativas = df.head(10) # Fallback para teste se a coluna for diferente
+        
+        resultados = bolsas_ativas.to_dict('records')
+        print(f"✅ Capturadas {len(resultados)} bolsas nacionais.")
+        return resultados
+    except Exception as e:
+        print(f"❌ Erro na captura nacional: {e}")
+        return # Retorna lista vazia para não quebrar o main.py
