@@ -1,43 +1,45 @@
 import requests
 
-def capturar_horizon():
-    url = "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA"
+def captura_horizon():
+
+    print("Consultando Horizon Europe...")
+
+    url = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
 
     payload = {
-        "bool": {
-            "must": [
-                {"terms": {"type": ["1"]}},        # Grants
-                {"terms": {"status": ["31094501"]}} # Open calls
-            ]
-        }
+        "query": "*",
+        "page": 0,
+        "size": 20
     }
 
-    print("Consultando API Horizon Europe...")
-
     try:
-        response = requests.post(url, json=payload, timeout=20)
-        response.raise_for_status()
 
-        dados = response.json()
-        chamadas = dados.get("results", [])
+        r = requests.post(url, json=payload, timeout=20)
+        r.raise_for_status()
+
+        dados = r.json()
 
         resultados = []
 
+        chamadas = dados.get("results", [])
+
         for call in chamadas:
+
+            identifier = call.get("identifier")
+
             resultados.append({
                 "title": call.get("title"),
-                "deadline": call.get("deadline"),
-                "link": f"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/{call.get('identifier')}",
                 "provider": "Horizon Europe",
-                "description": call.get(
-                    "description",
-                    "Edital de pesquisa e inovação da União Europeia."
-                )
+                "deadline": call.get("deadline"),
+                "link": f"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/{identifier}",
+                "description": call.get("description","EU research funding call")
             })
 
-        print(f"✅ Recuperadas {len(resultados)} chamadas internacionais.")
+        print("Horizon:", len(resultados))
+
         return resultados
 
     except Exception as e:
-        print(f"❌ Erro Horizon: {e}")
+
+        print("Erro Horizon:", e)
         return []
