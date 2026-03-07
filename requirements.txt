@@ -1,0 +1,6 @@
+requests
+pandas
+playwright
+supabase
+python-dotenv
+sentence-transformers
