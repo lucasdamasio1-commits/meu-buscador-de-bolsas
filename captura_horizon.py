@@ -22,7 +22,7 @@ def captura_horizon():
         dados = response.json()
         chamadas = dados.get('results',)
         
-        resultados =
+        oportunidades =
         for call in chamadas:
             resultados.append({
                 "titulo": call.get('title'), # Padronizado para seu script de embeddings
@@ -38,4 +38,5 @@ def captura_horizon():
         return
 
     return resultados
+
 
