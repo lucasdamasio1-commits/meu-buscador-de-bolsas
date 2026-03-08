@@ -9,19 +9,25 @@ def captura_horizon():
     payload = {
         "query": "*",
         "page": 0,
-        "size": 20
+        "size": 20,
+        "sort": "deadline"
+    }
+
+    headers = {
+        "Content-Type": "application/json"
     }
 
     try:
 
-        r = requests.post(url, json=payload, timeout=20)
+        r = requests.post(url, json=payload, headers=headers, timeout=30)
+
         r.raise_for_status()
 
-        dados = r.json()
+        data = r.json()
 
         resultados = []
 
-        chamadas = dados.get("results", [])
+        chamadas = data.get("results", [])
 
         for call in chamadas:
 
@@ -32,7 +38,7 @@ def captura_horizon():
                 "provider": "Horizon Europe",
                 "deadline": call.get("deadline"),
                 "link": f"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/{identifier}",
-                "description": call.get("description","EU research funding call")
+                "description": call.get("description","EU research funding")
             })
 
         print("Horizon:", len(resultados))
@@ -42,4 +48,5 @@ def captura_horizon():
     except Exception as e:
 
         print("Erro Horizon:", e)
+
         return []
