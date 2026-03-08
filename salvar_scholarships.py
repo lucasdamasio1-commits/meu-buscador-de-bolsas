@@ -32,7 +32,7 @@ def salvar_scholarships(oportunidades):
             # Upsert usa o link como chave para não duplicar
             supabase.table("scholarships").upsert(dados_banco, on_conflict="link").execute()
             
-        except Exception as e:
+    except Exception as e:
             print(f"⚠️ Erro ao salvar item {o.get('titulo')}: {e}")
 
     print("✅ Processo de salvamento concluído.")
