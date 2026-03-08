@@ -6,7 +6,7 @@ def captura_nacional():
     url = "https://www.gov.br/cnpq/pt-br/chamadas/abertas-para-submissao"
     
     # Trocamos 'resultados' por 'oportunidades' aqui
-    oportunidades = 
+    oportunidades = []
     
     try:
         response = requests.get(url, timeout=30)
@@ -36,3 +36,4 @@ def captura_nacional():
     
     # Retornamos a lista com o novo nome
     return oportunidades
+
