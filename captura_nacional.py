@@ -16,7 +16,7 @@ def captura_nacional():
         for link in links:
             titulo = link.get_text().strip()
             if "Chamada" in titulo or "Edital" in titulo:
-                resultados.append({
+                oportunidades.append({
                     "titulo": titulo,
                     "descricao": "Edital aberto para submissão de propostas.",
                     "prazo": "Veja no edital",
@@ -25,8 +25,9 @@ def captura_nacional():
                 })
         
         print(f"✅ CNPq: {len(resultados)} chamadas encontradas.")
-        return resultados
+        return oportunidades
     except Exception as e:
         print(f"⚠️ Erro ao acessar portal CNPq: {e}")
         return
+
 
