@@ -24,20 +24,21 @@ def captura_horizon():
         
         oportunidades = []
         for call in chamadas:
-            resultados.append({
+            oportunidades.append({
                 "titulo": call.get('title'), # Padronizado para seu script de embeddings
                 "descricao": call.get('description', 'Edital internacional.'),
                 "prazo": call.get('deadline'),
                 "link": f"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/{call.get('identifier')}",
                 "origem": "Horizon Europe"
             })
-        print(f"✅ Horizon Europe: {len(resultados)} recuperadas.")
-        return resultados
+        print(f"✅ Horizon Europe: {len(oportunidades)} recuperadas.")
+        return oportunidades
     except Exception as e:
         print(f"⚠️ Erro Horizon: {e}")
         return
 
-    return resultados
+    return oportunidades
+
 
 
 
