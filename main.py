@@ -13,7 +13,7 @@ def executar():
 
     print("Iniciando coleta:", datetime.datetime.now())
 
-    resultados = []
+    oportunidades = []
 
     oportunidades += captura_nacional()
     oportunidades += captura_fapesp()
@@ -34,6 +34,7 @@ def executar():
 
 if __name__ == "__main__":
     executar()
+
 
 
 
