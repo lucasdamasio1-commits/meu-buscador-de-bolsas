@@ -1,75 +1,41 @@
 import requests
 
-
 def captura_horizon():
-
     print("Consultando Horizon Europe...")
-
+    # A API exige o parâmetro 'text'. Usamos '***' para trazer todos os resultados
     url = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
-
-    params = {
-        "apiKey": "SEDIA",
-        "pageSize": 50,
-        "pageNumber": 1
-    }
-
+    params = {'apiKey': 'SEDIA', 'text': '***'}
+    
     payload = {
-        "query": {
-            "bool": {
-                "must": [
-                    {"terms": {"type": ["1"]}},
-                    {"terms": {"status": ["31094501"]}}
-                ]
-            }
+        "bool": {
+            "must": [
+                { "terms": { "type": ["1"] } },
+                { "terms": { "status": ["31094501"] } }
+            ]
         }
     }
-
-    headers = {
-        "Content-Type": "application/json",
-        "Accept": "application/json",
-        "User-Agent": "Mozilla/5.0"
-    }
-
-    response = requests.post(
-        url,
-        params=params,
-        json=payload,
-        headers=headers,
-        timeout=30
-    )
-
-    if response.status_code != 200:
-        print("Erro Horizon:", response.text)
-        return []
-
-    data = response.json()
-
-    oportunidades = []
-
+    
     try:
-
-        resultados = data["hits"]["hits"]
-
-        for item in resultados:
-
-            fonte = item["_source"]
-
-            titulo = fonte.get("title", "Sem título")
-            descricao = fonte.get("description", "")
-
-            oportunidades.append({
-                "titulo": titulo,
-                "instituicao": "Horizon Europe",
-                "area": "Pesquisa",
-                "pais": "Europa",
-                "link": "https://ec.europa.eu/info/funding-tenders/opportunities/portal/",
-                "descricao": descricao
+        response = requests.post(url, params=params, json=payload, timeout=30)
+        response.raise_for_status()
+        
+        dados = response.json()
+        chamadas = dados.get('results',)
+        
+        resultados =
+        for call in chamadas:
+            resultados.append({
+                "titulo": call.get('title'), # Padronizado para seu script de embeddings
+                "descricao": call.get('description', 'Edital internacional.'),
+                "prazo": call.get('deadline'),
+                "link": f"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/{call.get('identifier')}",
+                "origem": "Horizon Europe"
             })
-
+        print(f"✅ Horizon Europe: {len(resultados)} recuperadas.")
+        return resultados
     except Exception as e:
-
-        print("Erro ao processar Horizon:", e)
-
-    print("Horizon encontrados:", len(resultados))
+        print(f"⚠️ Erro Horizon: {e}")
+        return
 
     return resultados
+
