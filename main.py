@@ -2,6 +2,8 @@ from captura_nacional import captura_nacional
 from captura_fapesp import captura_fapesp
 from captura_horizon import captura_horizon
 from salvar_scholarships import salvar_scholarships
+from embeddings import gerar_embeddings
+import datetime
 
 import datetime
 import json
@@ -21,6 +23,8 @@ def executar():
     print("Dados enviados ao Supabase")
     print("Total capturado:", len(resultados))
 
+    gerar_embeddings()
+
     with open("oportunidades.json","w",encoding="utf-8") as f:
         json.dump(resultados,f,indent=2,ensure_ascii=False)
 
@@ -28,6 +32,7 @@ def executar():
 
 if __name__ == "__main__":
     executar()
+
 
 
 
