@@ -4,49 +4,53 @@ def captura_horizon():
 
     print("Consultando Horizon Europe...")
 
-    url = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
+    url = "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA"
 
     payload = {
-        "query": "*",
-        "page": 0,
-        "size": 20,
-        "sort": "deadline"
+        "bool": {
+            "must": [
+                {"terms": {"type": ["1"]}},
+                {"terms": {"status": ["31094501"]}}
+            ]
+        }
     }
 
     headers = {
         "Content-Type": "application/json"
     }
 
+    resultados = []
+
     try:
 
-        r = requests.post(url, json=payload, headers=headers, timeout=30)
+        response = requests.post(url, json=payload, headers=headers, timeout=30)
 
-        r.raise_for_status()
+        response.raise_for_status()
 
-        data = r.json()
+        data = response.json()
 
-        resultados = []
+        documentos = data.get("results", [])
 
-        chamadas = data.get("results", [])
+        for item in documentos:
 
-        for call in chamadas:
+            titulo = item.get("title", "Sem título")
 
-            identifier = call.get("identifier")
+            descricao = item.get("content", "")
+
+            link = item.get("url", "")
 
             resultados.append({
-                "title": call.get("title"),
+                "title": titulo,
+                "description": descricao,
                 "provider": "Horizon Europe",
-                "deadline": call.get("deadline"),
-                "link": f"https://ec.europa.eu/info/funding-tenders/opportunities/portal/screen/opportunities/topic-details/{identifier}",
-                "description": call.get("description","EU research funding")
+                "link": link,
+                "deadline": None
             })
 
-        print("Horizon:", len(resultados))
-
-        return resultados
+        print("Horizon capturado:", len(resultados))
 
     except Exception as e:
 
         print("Erro Horizon:", e)
 
-        return []
+    return resultados
