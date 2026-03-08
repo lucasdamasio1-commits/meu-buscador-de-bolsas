@@ -20,4 +20,4 @@ def salvar_scholarships(lista):
             "embedding": embedding
         }
 
-        supabase.table("scholarships").insert(data).execute()
+        supabase.table("scholarships").upsert(data).execute()
