@@ -1,112 +1,158 @@
 import streamlit as st
 from supabase import create_client
+from sentence_transformers import SentenceTransformer
 import os
-import pandas as pd
 
-# -----------------------------
-# CONFIGURAÇÃO DA PÁGINA
-# -----------------------------
+# ------------------------------------------------
+# 1. CONFIGURAÇÃO DA PÁGINA
+# ------------------------------------------------
 
 st.set_page_config(
     page_title="Buscador de Bolsas",
-    page_icon="🎓",
-    layout="wide"
+    layout="wide",
+    page_icon="🎓"
 )
 
-st.title("🎓 Encontre oportunidades de bolsas de pesquisa")
+# ------------------------------------------------
+# 2. CONEXÃO SEGURA COM SUPABASE
+# ------------------------------------------------
 
-st.write("Oportunidades coletadas automaticamente de agências de fomento.")
+@st.cache_resource
+def init_connection():
 
-# -----------------------------
-# CONEXÃO COM SUPABASE
-# -----------------------------
+    url = None
+    key = None
 
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+    # tenta pegar primeiro dos Secrets do Streamlit
+    try:
+        url = st.secrets.get("SUPABASE_URL")
+        key = st.secrets.get("SUPABASE_KEY")
+    except:
+        pass
 
-supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+    # fallback para .env local
+    if not url or not key:
+        try:
+            from dotenv import load_dotenv
+            load_dotenv()
+            url = os.getenv("SUPABASE_URL")
+            key = os.getenv("SUPABASE_KEY")
+        except:
+            pass
 
-# -----------------------------
-# BUSCAR DADOS
-# -----------------------------
+    if not url or not key:
+        st.error(
+            "Credenciais do Supabase não encontradas. "
+            "Configure SUPABASE_URL e SUPABASE_KEY nos Secrets do Streamlit."
+        )
+        st.stop()
 
-@st.cache_data
-def carregar_dados():
+    return create_client(url, key)
 
-    response = supabase.table("scholarship").select("*").execute()
 
-    if response.data:
-        return pd.DataFrame(response.data)
+supabase = init_connection()
+
+# ------------------------------------------------
+# 3. MODELO DE IA PARA BUSCA SEMÂNTICA
+# ------------------------------------------------
+
+@st.cache_resource
+def load_model():
+
+    model = SentenceTransformer(
+        "paraphrase-multilingual-MiniLM-L12-v2"
+    )
+
+    return model
+
+
+model = load_model()
+
+# ------------------------------------------------
+# 4. INTERFACE DO USUÁRIO
+# ------------------------------------------------
+
+st.title("🎓 Oportunidades de Bolsa de Pesquisa")
+
+st.write(
+    "Pesquise oportunidades acadêmicas usando linguagem natural."
+)
+
+query = st.text_input(
+    "Descreva o que você procura (ex: Doutorado em Biologia na Europa)"
+)
+
+# ------------------------------------------------
+# 5. BUSCA
+# ------------------------------------------------
+
+dados = []
+
+try:
+
+    if query:
+
+        # vetor da consulta
+        query_vector = model.encode(query).tolist()
+
+        # busca semântica
+        res = supabase.rpc(
+            "match_documents",
+            {
+                "query_embedding": query_vector,
+                "match_threshold": 0.4,
+                "match_count": 10
+            }
+        ).execute()
+
+        dados = res.data
+
     else:
-        return pd.DataFrame()
 
-df = carregar_dados()
+        # mostra bolsas mais próximas do deadline
+        res = (
+            supabase
+            .table("scholarship")
+            .select("*")
+            .order("deadline", desc=False)
+            .limit(15)
+            .execute()
+        )
 
-# -----------------------------
-# SE NÃO HOUVER DADOS
-# -----------------------------
+        dados = res.data
 
-if df.empty:
-    st.warning("Nenhuma oportunidade encontrada no banco de dados.")
-    st.stop()
+except Exception as e:
 
-# -----------------------------
-# FILTRO DE BUSCA
-# -----------------------------
+    st.error("Erro ao consultar o banco de dados.")
+    st.exception(e)
 
-busca = st.text_input("🔎 Buscar por palavra-chave")
+# ------------------------------------------------
+# 6. EXIBIÇÃO DOS RESULTADOS
+# ------------------------------------------------
 
-if busca:
-    df = df[
-        df["title"].str.contains(busca, case=False, na=False) |
-        df["description"].str.contains(busca, case=False, na=False)
-    ]
+if not dados:
 
-# -----------------------------
-# FILTRO POR PROVEDOR
-# -----------------------------
+    st.info("Nenhuma bolsa encontrada para esta busca.")
 
-provedores = df["provider"].dropna().unique()
+else:
 
-filtro_provedor = st.selectbox(
-    "Filtrar por instituição",
-    ["Todos"] + list(provedores)
-)
+    st.write(f"🔎 {len(dados)} oportunidades encontradas")
 
-if filtro_provedor != "Todos":
-    df = df[df["provider"] == filtro_provedor]
+    for item in dados:
 
-# -----------------------------
-# ORDENAR POR DEADLINE
-# -----------------------------
+        titulo = item.get("title", "Sem título")
+        provider = item.get("provider", "Instituição desconhecida")
 
-if "deadline" in df.columns:
-    df = df.sort_values("deadline")
+        with st.expander(f"{titulo} — {provider}"):
 
-# -----------------------------
-# MOSTRAR RESULTADOS
-# -----------------------------
+            deadline = item.get("deadline", "Não informado")
+            description = item.get("description", "")
+            link = item.get("link", "")
 
-st.write(f"📊 {len(df)} oportunidades encontradas")
+            st.write(f"**Prazo:** {deadline}")
 
-for _, row in df.iterrows():
+            if description:
+                st.write(description)
 
-    with st.container():
-
-        st.subheader(row["title"])
-
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.write(f"🏛 **Instituição:** {row['provider']}")
-
-        with col2:
-            st.write(f"📅 **Deadline:** {row['deadline']}")
-
-        st.write(row["description"])
-
-        if row["link"]:
-            st.link_button("Abrir edital", row["link"])
-
-        st.divider()
-
+            if link:
+                st.link_button("Ver Edital", link)
