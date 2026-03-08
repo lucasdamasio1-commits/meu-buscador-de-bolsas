@@ -1,53 +1,48 @@
 import requests
 
-
-def captura_horizon():
-
+def capturar_horizon():
     print("Consultando Horizon Europe...")
 
-    url = "https://api.tech.ec.europa.eu/search-api/prod/rest/search?apiKey=SEDIA"
+    url = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
 
     payload = {
-        "query": {
-            "bool": {
-                "must": [
-                    {"terms": {"type": ["1"]}},
-                    {"terms": {"status": ["31094501"]}}
-                ]
-            }
-        },
-        "from": 0,
-        "size": 50
+        "bool": {
+            "must": [
+                {"terms": {"type": ["1"]}},
+                {"terms": {"status": ["31094501"]}}
+            ]
+        }
+    }
+
+    params = {
+        "apiKey": "SEDIA",
+        "pageSize": 50,
+        "pageNumber": 1
     }
 
     headers = {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "User-Agent": "Mozilla/5.0"
     }
 
-    resultados = []
+    response = requests.post(url, params=params, json=payload, headers=headers)
+    response.raise_for_status()
 
-    try:
+    data = response.json()
 
-        response = requests.post(url, json=payload, headers=headers)
+    oportunidades = []
 
-        response.raise_for_status()
+    for item in data.get("results", []):
+        oportunidades.append({
+            "titulo": item.get("title"),
+            "instituicao": "Horizon Europe",
+            "area": "Pesquisa",
+            "pais": "Europa",
+            "link": item.get("url"),
+            "descricao": item.get("description", "")
+        })
 
-        data = response.json()
+    print("Horizon encontrados:", len(oportunidades))
 
-        for item in data.get("results", []):
-
-            resultados.append({
-                "title": item.get("title", ""),
-                "description": item.get("content", ""),
-                "provider": "Horizon Europe",
-                "link": item.get("url", ""),
-                "deadline": None
-            })
-
-        print("Horizon capturado:", len(resultados))
-
-    except Exception as e:
-
-        print("Erro Horizon:", e)
-
-    return resultados
+    return oportunidades
