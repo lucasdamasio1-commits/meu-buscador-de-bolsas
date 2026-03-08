@@ -1,7 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
 
-def capturar_nacional():
+def captura_nacional():
     print("Capturando chamadas abertas do CNPq...")
     url = "https://www.gov.br/cnpq/pt-br/chamadas/abertas-para-submissao"
     
@@ -29,3 +29,4 @@ def capturar_nacional():
     except Exception as e:
         print(f"⚠️ Erro ao acessar portal CNPq: {e}")
         return
+
