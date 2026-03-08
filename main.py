@@ -15,10 +15,10 @@ def executar():
 
     resultados = []
 
-    resultados += captura_nacional()
-    resultados += captura_fapesp()
-    resultados += captura_horizon()
-    resultados += captura_daad()
+    oportunidades += captura_nacional()
+    oportunidades += captura_fapesp()
+    oportunidades += captura_horizon()
+    oportunidades += captura_daad()
     
     salvar_scholarships(resultados)
 
@@ -28,12 +28,13 @@ def executar():
     gerar_embeddings()
 
     with open("oportunidades.json","w",encoding="utf-8") as f:
-        json.dump(resultados,f,indent=2,ensure_ascii=False)
+        json.dump(oportunidades,f,indent=2,ensure_ascii=False)
 
     print("Arquivo salvo.")
 
 if __name__ == "__main__":
     executar()
+
 
 
 
