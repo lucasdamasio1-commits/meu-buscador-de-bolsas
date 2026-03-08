@@ -6,32 +6,21 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-script:
+
+  crawler:
 
     runs-on: ubuntu-latest
 
     steps:
 
-      - name: Baixar repositório
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-      - name: Instalar Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - name: Instalar dependências
-        run: |
-          pip install -r requirements.txt
-          playwright install
+      - run: pip install -r requirements.txt
 
-      - name: Executar crawler
-        run: python main.py
+      - run: playwright install
 
-      - name: Commit resultados
-        run: |
-          git config --global user.name "bot"
-          git config --global user.email "bot@github.com"
-          git add oportunidades.json
-          git commit -m "Atualização automática"
-          git push
+      - run: python main.py
