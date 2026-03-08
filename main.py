@@ -1,6 +1,7 @@
 from captura_nacional import captura_nacional
 from captura_fapesp import captura_fapesp
 from captura_horizon import captura_horizon
+from captura.daad import captura_daad
 from salvar_scholarships import salvar_scholarships
 from embeddings import gerar_embeddings
 import datetime
@@ -17,6 +18,7 @@ def executar():
     resultados += captura_nacional()
     resultados += captura_fapesp()
     resultados += captura_horizon()
+    resultados += capturar_daad()
     
     salvar_scholarships(resultados)
 
@@ -32,6 +34,7 @@ def executar():
 
 if __name__ == "__main__":
     executar()
+
 
 
 
