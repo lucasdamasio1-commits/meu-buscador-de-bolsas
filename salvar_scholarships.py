@@ -1,23 +1,19 @@
-from supabase_client import supabase
-from embeddings import gerar_embedding
+from supabase import create_client
+import os
 
+SUPABASE_URL = os.environ["SUPABASE_URL"]
+SUPABASE_KEY = os.environ["SUPABASE_KEY"]
 
-def salvar_scholarships(lista):
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-    for item in lista:
+def salvar_scholarships(data):
 
-        titulo = item.get("title")
-        descricao = item.get("description")
+    if not data:
+        print("Nenhum dado para salvar")
+        return
 
-        embedding = gerar_embedding(titulo, descricao)
+    supabase.table("scholarships")\
+        .upsert(data, on_conflict="link")\
+        .execute()
 
-        data = {
-            "title": titulo,
-            "description": descricao,
-            "provider": item.get("provider"),
-            "link": item.get("link"),
-            "deadline": item.get("deadline"),
-            "embedding": embedding
-        }
-
-        supabase.table("scholarships").upsert(data).execute()
+    print("Dados salvos no Supabase:", len(data))
