@@ -25,7 +25,7 @@ def carregar_modelo_ia():
 # CAPTURA DE OPORTUNIDADES FAPESP
 # ------------------------------
 
-def captura_fapesp(max_resultados=50):
+def captura_fapesp(max_resultados=100):
 
     print("Capturando oportunidades da FAPESP...")
 
@@ -175,4 +175,5 @@ if __name__ == "__main__":
         print()
 
     print("Tempo total:", round(time.time() - inicio, 2), "segundos")
+
 
