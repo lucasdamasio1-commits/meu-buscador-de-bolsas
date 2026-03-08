@@ -15,8 +15,8 @@ def executar():
     resultados += captura_nacional()
     resultados += captura_fapesp()
     resultados += captura_horizon()
-
-      salvar_scholarships(oportunidades)
+    
+    salvar_scholarships(oportunidades)
 
     print("Dados enviados ao Supabase")
     print("Total capturado:", len(resultados))
@@ -28,4 +28,5 @@ def executar():
 
 if __name__ == "__main__":
     executar()
+
 
