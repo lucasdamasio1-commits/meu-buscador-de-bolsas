@@ -1,15 +1,23 @@
 from supabase_client import supabase
+from embeddings import gerar_embedding
+
 
 def salvar_scholarships(lista):
 
     for item in lista:
 
+        titulo = item.get("title")
+        descricao = item.get("description")
+
+        embedding = gerar_embedding(titulo, descricao)
+
         data = {
-            "title": item.get("title"),
-            "description": item.get("description"),
+            "title": titulo,
+            "description": descricao,
             "provider": item.get("provider"),
             "link": item.get("link"),
-            "deadline": item.get("deadline")
+            "deadline": item.get("deadline"),
+            "embedding": embedding
         }
 
         supabase.table("scholarship").insert(data).execute()
