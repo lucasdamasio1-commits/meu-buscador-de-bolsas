@@ -20,10 +20,10 @@ def executar():
     oportunidades += captura_horizon()
     oportunidades += captura_daad()
     
-    salvar_scholarships(resultados)
+    salvar_scholarships(oportunidades)
 
     print("Dados enviados ao Supabase")
-    print("Total capturado:", len(resultados))
+    print("Total capturado:", len(oportunidades))
 
     gerar_embeddings()
 
@@ -34,6 +34,7 @@ def executar():
 
 if __name__ == "__main__":
     executar()
+
 
 
 
