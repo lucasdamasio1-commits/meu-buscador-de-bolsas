@@ -1,46 +1,59 @@
 import pandas as pd
 import io
-from utils import get_request
+import requests
+import time
 
 def captura_nacional():
 
     print("Capturando bolsas CNPq...")
 
-    CSV_LINK = "https://dadosabertos.cnpq.br/bolsas_pais_2024.csv"
+    url = "https://dadosabertos.cnpq.br/bolsas_pais_2024.csv"
 
-    try:
+    headers = {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "text/csv"
+    }
 
-        response = get_request(CSV_LINK)
+    for tentativa in range(3):
 
-        df = pd.read_csv(
-            io.BytesIO(response.content),
-            sep=";",
-            encoding="latin-1",
-            on_bad_lines="skip"
-        )
+        try:
 
-        df.columns = [c.upper() for c in df.columns]
+            r = requests.get(url, headers=headers, timeout=60)
 
-        if "STATUS_BOLSA" in df.columns:
-            bolsas = df[df["STATUS_BOLSA"] == "ATIVO"]
-        else:
-            bolsas = df.head(20)
+            r.raise_for_status()
 
-        resultados = []
+            df = pd.read_csv(
+                io.BytesIO(r.content),
+                sep=";",
+                encoding="latin-1",
+                on_bad_lines="skip"
+            )
 
-        for _, row in bolsas.head(30).iterrows():
+            df.columns = [c.upper() for c in df.columns]
 
-            resultados.append({
-                "title": f"Bolsa {row.get('MODALIDADE_BOLSA','Pesquisa')}",
-                "provider": "CNPq",
-                "link": "https://www.gov.br/cnpq",
-                "description": f"{row.get('NOME_INSTITUICAO','')} - {row.get('NOME_GRANDE_AREA','')}",
-                "deadline": None
-            })
+            bolsas = df.head(30)
 
-        print("CNPq:", len(resultados))
-        return resultados
+            resultados = []
 
-    except Exception as e:
-        print("Erro CNPq:", e)
-        return []
+            for _, row in bolsas.iterrows():
+
+                resultados.append({
+                    "title": f"Bolsa {row.get('MODALIDADE_BOLSA','Pesquisa')}",
+                    "provider": "CNPq",
+                    "link": "https://www.gov.br/cnpq",
+                    "description": row.get("NOME_GRANDE_AREA","Pesquisa científica"),
+                    "deadline": None
+                })
+
+            print("CNPq:", len(resultados))
+
+            return resultados
+
+        except Exception as e:
+
+            print("Tentativa CNPq falhou:", tentativa + 1)
+            time.sleep(5)
+
+    print("CNPq indisponível")
+
+    return []
