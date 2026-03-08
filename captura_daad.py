@@ -1,7 +1,7 @@
 import requests
 
 
-def capturar_daad():
+def captura_daad():
 
     print("Consultando DAAD...")
 
