@@ -1,6 +1,6 @@
 import requests
 
-def capturar_horizon():
+def captura_horizon():
     print("Consultando Horizon Europe...")
 
     url = "https://api.tech.ec.europa.eu/search-api/prod/rest/search"
@@ -46,3 +46,4 @@ def capturar_horizon():
     print("Horizon encontrados:", len(oportunidades))
 
     return oportunidades
+
