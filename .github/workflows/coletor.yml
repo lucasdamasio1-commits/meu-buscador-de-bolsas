@@ -11,16 +11,25 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
     steps:
 
-      - uses: actions/checkout@v3
+      - name: Clonar repositório
+        uses: actions/checkout@v3
 
-      - uses: actions/setup-python@v4
+      - name: Instalar Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.10"
 
-      - run: pip install -r requirements.txt
+      - name: Instalar dependências
+        run: pip install -r requirements.txt
 
-      - run: playwright install
+      - name: Instalar navegadores Playwright
+        run: playwright install
 
-      - run: python main.py
+      - name: Executar crawler
+        run: python main.py
