@@ -4,3 +4,6 @@ playwright
 supabase
 python-dotenv
 sentence-transformers
+beautifulsoup4
+requests
+streamlit
