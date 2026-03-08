@@ -12,8 +12,8 @@ def salvar_scholarships(oportunidades):
 
     print(f"Iniciando gravação de {len(oportunidades)} itens no banco...")
 
-    for o in oportunidades: []
-    try:
+    for o in oportunidades:
+        try:
             # Gerar embedding para busca semântica
             texto_para_ia = f"{o.get('titulo', '')} {o.get('descricao', '')}"
             vetor = model.encode(texto_para_ia).tolist()
