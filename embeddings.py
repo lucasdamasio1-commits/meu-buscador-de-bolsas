@@ -21,7 +21,7 @@ def gerar_embeddings():
 
     for bolsa in bolsas:
 
-        texto = f"{bolsa['titulo']} {bolsa['descricao']}"
+        texto = f"{bolsa['title']} {bolsa['description']}"
 
         embedding = model.encode(texto).tolist()
 
