@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 def captura_fulbright():
     print("Capturando oportunidades da Fulbright Brasil...")
     url = "https://fulbright.org.br/bolsas-para-brasileiros/"
-    oportunidades =
+    oportunidades = []
 
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36"
