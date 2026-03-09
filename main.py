@@ -52,8 +52,8 @@ def executar():
         print("Erro DAAD:", e)
 
     try:
-    oportunidades.extend(captura_universidades() or [])
-except Exception as e:
+        oportunidades.extend(captura_universidades() or [])
+    except Exception as e:
     print("Erro universidades:", e)
 
     # -------- SALVAR RESULTADOS --------
@@ -78,4 +78,5 @@ except Exception as e:
 
 if __name__ == "__main__":
     executar()
+
 
