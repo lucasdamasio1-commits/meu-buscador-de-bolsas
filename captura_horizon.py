@@ -27,7 +27,7 @@ def captura_horizon():
         data = response.json()
         
         itens = data.get('results',)
-        oportunidades =
+        oportunidades = []
 
         for item in itens:
             # Pegamos o código legível (ex: HORIZON-CL2-2024-...) [3, 4]
@@ -57,6 +57,7 @@ def captura_horizon():
     except Exception as e:
         print(f"⚠️ Erro Horizon: {e}")
         return
+
 
 
 
