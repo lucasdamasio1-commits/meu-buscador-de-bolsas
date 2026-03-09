@@ -5,7 +5,7 @@ def captura_euraxess():
     print("Capturando oportunidades globais (EURAXESS)...")
     # Filtro para jobs/funding em todas as áreas e países
     url = "https://euraxess.ec.europa.eu/jobs/search"
-    oportunidades =
+    oportunidades = []
     
     headers = {"User-Agent": "Mozilla/5.0"}
     try:
