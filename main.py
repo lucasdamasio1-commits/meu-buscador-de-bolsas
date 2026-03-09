@@ -54,7 +54,7 @@ def executar():
     try:
         oportunidades.extend(captura_universidades() or [])
     except Exception as e:
-    print("Erro universidades:", e)
+        print("Erro universidades:", e)
 
     # -------- SALVAR RESULTADOS --------
     if oportunidades:
@@ -78,5 +78,6 @@ def executar():
 
 if __name__ == "__main__":
     executar()
+
 
 
