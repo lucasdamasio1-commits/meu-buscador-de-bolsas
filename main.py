@@ -4,6 +4,7 @@ from captura_horizon import captura_horizon
 from captura_daad import captura_daad
 from captura_euraxess import captura_euraxess
 from captura_fulbright import captura_fulbright
+from captura_universidades import captura_universidades
 
 from salvar_scholarships import salvar_scholarships
 from embeddings import gerar_embeddings
@@ -50,6 +51,11 @@ def executar():
     except Exception as e:
         print("Erro DAAD:", e)
 
+    try:
+    oportunidades.extend(captura_universidades() or [])
+except Exception as e:
+    print("Erro universidades:", e)
+
     # -------- SALVAR RESULTADOS --------
     if oportunidades:
 
@@ -72,3 +78,4 @@ def executar():
 
 if __name__ == "__main__":
     executar()
+
