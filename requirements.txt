@@ -16,3 +16,4 @@ gunicorn
 torch
 flask
 gunicorn
+feedparser
